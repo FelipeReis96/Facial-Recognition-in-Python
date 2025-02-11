@@ -43,7 +43,6 @@ def recognize_face(frame, known_faces):
             best_match_index = np.argmin(face_distances)
             name = known_faces[best_match_index][0]
         
-        cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
         cv2.putText(frame, name, (left, top - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
     
     return frame
@@ -83,3 +82,4 @@ while True:
 
 video_capture.release()
 cv2.destroyAllWindows()
+
