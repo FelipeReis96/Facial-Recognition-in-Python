@@ -39,8 +39,9 @@ def recognize_face(frame, known_faces):
         name = "Desconhecido"
         
         if True in matches:
-            matched_idx = matches.index(True)
-            name = known_faces[matched_idx][0]
+            face_distances = face_recognition.face_distance([f[1] for f in known_faces], face_encoding)
+            best_match_index = np.argmin(face_distances)
+            name = known_faces[best_match_index][0]
         
         cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
         cv2.putText(frame, name, (left, top - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
@@ -50,9 +51,11 @@ def recognize_face(frame, known_faces):
 # Inicializa o banco de dados
 init_db()
 
+# Carregar rostos salvos antes de iniciar a captura de vídeo
+known_faces = load_faces()
+
 # Captura de vídeo
 video_capture = cv2.VideoCapture(0)
-known_faces = load_faces()
 
 while True:
     ret, frame = video_capture.read()
