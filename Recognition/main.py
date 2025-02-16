@@ -16,6 +16,8 @@ def get_switch_position():
     left = GPIO.input(SWITCH_LEFT)
     right = GPIO.input(SWITCH_RIGHT)
     
+    print(f"Estado dos switches -> LEFT: {left}, RIGHT: {right}")  # Debug
+    
     if left == GPIO.LOW:
         return "LEFT"
     elif right == GPIO.LOW:
@@ -127,19 +129,27 @@ def train_model():
 
 train_model()
 
-cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
-if not cap.isOpened():
-    cap = cv2.VideoCapture(0, cv2.CAP_ANY)
-if not cap.isOpened():
-    raise Exception("Erro: Não foi possível abrir a câmera.")
+cap = None  # Inicializa a variável fora do loop
 
 while True:
     position = get_switch_position()
     
     if position == "LEFT":
         print("Chave na esquerda → Modo Cadastro de Rostos")
+        if cap is not None:
+            cap.release()  # Fecha a câmera se estiver aberta
         capture_multiple_faces(num_samples=30)
     elif position == "RIGHT":
+        print("Chave na direita → Modo Reconhecimento Facial")
+        if cap is None:  # Abre a câmera se ainda não estiver aberta
+            cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
+            if not cap.isOpened():
+                cap = cv2.VideoCapture(0, cv2.CAP_ANY)
+            if not cap.isOpened():
+                raise Exception("Erro: Não foi possível abrir a câmera.")
+            else:
+                print("Câmera aberta com sucesso!")
+
         ret, frame = cap.read()
         if not ret:
             break
